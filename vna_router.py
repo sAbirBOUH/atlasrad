@@ -38,7 +38,33 @@ def handle_store(event):
     filename = f"dicom_anonymises/intercepte_{modalite}_{dataset.SOPInstanceUID}.dcm"
     dataset.save_as(filename, write_like_original=False)
     
+    
+    import sqlite3
+    try:
+        conn = sqlite3.connect("atlasrad.db")
+        cursor = conn.cursor()
+        
+        # Le "Cerveau" attribue automatiquement un Agent IA selon la description DICOM
+        ia_attribue = "Analyse Générique standard"
+        desc = dataset.get("StudyDescription", "Inconnu").upper()
+        if "CEREBRAL" in desc or "BRAIN" in desc or "CRA" in desc:
+            ia_attribue = "MONAI Brain Tumor 🧠"
+        elif "THORAX" in desc or "POUMON" in desc:
+            ia_attribue = "LUNA16 (Poumon) 🫁"
+            
+        # Insertion dans la vraie table de la plateforme
+        cursor.execute("""
+            INSERT INTO examens (anonymized_id, modalite, description, modele_ia, statut)
+            VALUES (?, ?, ?, ?, ?)
+        """, ("AR-9999", modalite, dataset.get("StudyDescription", "Inconnu"), ia_attribue, "Anonymisé & Routé"))
+        conn.commit()
+        conn.close()
+        print("[DATABASE] 📝 Ligne interceptée et ajoutée visiblement sur le Tableau de Bord ! !")
+    except Exception as e:
+        print(f"[ERREUR DB] {e}")
+        
     print(f"[SUCCÈS] ✅ Fichier sécurisé et routé vers : {filename}")
+
     print("-"*50)
     
     return 0x0000 # Code DICOM "Success" envoyé au scanner

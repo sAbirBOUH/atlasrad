@@ -34,6 +34,19 @@ def init_db():
         ''')
         print("[DATABASE] Compte Admin (Sabir) créé avec succès !")
     
+
+    # Création de la table des examens médicaux interceptés
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS examens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            anonymized_id TEXT,
+            modalite TEXT,
+            description TEXT,
+            modele_ia TEXT,
+            statut TEXT,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -104,6 +117,21 @@ def connexion_clinique(demande: LoginDemande):
         # Si la ligne n'existe pas en DB, on rejette sèchement (Erreur 401)
         print("[AUTH] Accès Refusé. Identifiants incorrects.")
         raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect.")
+
+
+@app.get("/api/exams")
+def get_exams():
+    """Récupère la liste des examens DICOM depuis la base de données SQLite"""
+    conn = sqlite3.connect("atlasrad.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT anonymized_id, modalite, description, modele_ia, statut FROM examens ORDER BY id DESC LIMIT 10")
+    lignes = cursor.fetchall()
+    conn.close()
+    
+    result = []
+    for l in lignes:
+        result.append({"id": l[0], "modalite": l[1], "description": l[2], "ia": l[3], "statut": l[4]})
+    return {"examens": result}
 
 # ==========================================
 # Lancement du Serveur

@@ -258,45 +258,7 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="vna-queue">
-                                <!-- Initial items -->
-                                <tr>
-                                    <td class="font-mono text-[#00C8FF]">AR-10492</td>
-                                    <td><span class="bg-gray-800 text-xs px-2 py-1 rounded">CT</span></td>
-                                    <td>Thorax sans inj.</td>
-                                    <td>LUNA16 (Nodule)</td>
-                                    <td>
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#00FF9D]"></span> <span class="text-xs text-[#00FF9D]">Prêt à lire (CR généré)</span>
-                                        </div>
-                                    </td>
-                                    <td><button class="text-xs font-bold text-[#C5922A] hover:underline uppercase">Ouvrir WebViewer</button></td>
-                                </tr>
-                                <tr>
-                                    <td class="font-mono text-[#00C8FF]">AR-10493</td>
-                                    <td><span class="bg-gray-800 text-xs px-2 py-1 rounded">MR</span></td>
-                                    <td>Crâne T1/T2</td>
-                                    <td>MONAI Brain Tumor</td>
-                                    <td>
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#E8B856] animate-pulse"></span> <span class="text-xs text-[#E8B856]">Inférence IA en cours (65%)</span>
-                                        </div>
-                                    </td>
-                                    <td><button class="text-xs text-gray-500 uppercase cursor-not-allowed">Patienter</button></td>
-                                </tr>
-                                <tr>
-                                    <td class="font-mono text-[#00C8FF]">AR-10494</td>
-                                    <td><span class="bg-gray-800 text-xs px-2 py-1 rounded">CT</span></td>
-                                    <td>Angio-Scanner Aorte</td>
-                                    <td>AortaSeg (Custom)</td>
-                                    <td>
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#00C8FF] animate-pulse"></span> <span class="text-xs text-[#00C8FF]">Anonymisation de l'en-tête...</span>
-                                        </div>
-                                    </td>
-                                    <td><button class="text-xs text-gray-500 uppercase cursor-not-allowed">Patienter</button></td>
-                                </tr>
-                            </tbody>
+                            <tbody id="vna-queue"></tbody>
                         </table>
                     </div>
                 </div>
@@ -361,6 +323,46 @@
         }
 
         setTimeout(appendLog, 1500);
+
+
+        // Fetch les vrais examens depuis le Cerveau (server.py)
+        async function fetchExams() {
+            try {
+                const res = await fetch('http://127.0.0.1:8000/api/exams');
+                const data = await res.json();
+                const tbody = document.getElementById('vna-queue');
+                tbody.innerHTML = ''; // On efface pour mettre à jour
+                
+                data.examens.forEach(ex => {
+                    let statusColor = ex.statut.includes("Anonymisé") ? "#00FF9D" : "#E8B856";
+                    let animClass = ex.statut.includes("Anonymisé") ? "" : "animate-pulse";
+                    
+                    let tr = document.createElement('tr');
+                    tr.classList.add("border-b", "border-[#1A6FA8]/20", "hover:bg-[#1A6FA8]/10", "transition-colors");
+                    tr.innerHTML = `
+                        <td class="font-mono text-[#00C8FF] font-bold p-4 py-3">${ex.id}</td>
+                        <td class="p-4 py-3"><span class="bg-gray-800 text-xs px-2 py-1 rounded font-bold border border-gray-600">${ex.modalite}</span></td>
+                        <td class="text-sm p-4 py-3">${ex.description}</td>
+                        <td class="text-sm font-semibold text-[#1A6FA8] p-4 py-3">${ex.ia}</td>
+                        <td class="p-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full ${animClass}" style="background:${statusColor}; box-shadow: 0 0 10px ${statusColor}"></span> 
+                                <span class="text-xs font-bold" style="color:${statusColor}">${ex.statut}</span>
+                            </div>
+                        </td>
+                        <td class="p-4 py-3"><button class="text-xs font-bold bg-[#1A6FA8]/20 px-3 py-1 rounded border border-[#1A6FA8] text-[#00C8FF] hover:bg-[#1A6FA8] hover:text-white uppercase transition-all">Ouvrir</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch(e) {
+                console.error("API non détectée : Le serveur Python est-il allumé sur le port 8000 ?", e);
+            }
+        }
+        
+        // Rafraîchissement automatique de la liste toutes les 2 secondes (Live Feed)
+        setInterval(fetchExams, 2000);
+        fetchExams();
+
     </script>
 </body>
 </html>
