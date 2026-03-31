@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AtlasRad | Plateforme d'IA en Radiologie d'Entreprise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@200;300;400;600&display=swap" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f4ff',
+                            100: '#e5edff',
+                            200: '#cddbfe',
+                            300: '#a4bdfc',
+                            400: '#7594fa',
+                            500: '#5266ec', /* Primary Blue/Purple Accent */
+                            600: '#3d46d2',
+                            700: '#3336b2',
+                            800: '#2b2e90',
+                            900: '#262a73',
+                            950: '#171846', /* Deep space background */
+                        },
+                        surface: '#0f101c', /* Darkest background */
+                        card: '#151628', /* Elevated elements */
+                        morocco: '#c1272d', /* Moroccan Red Accent */
+                        moroccoDark: '#8a1c20',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 40px -10px rgba(82, 102, 236, 0.4)',
+                        'glow-intense': '0 0 50px rgba(82, 102, 236, 0.6)',
+                        'glow-morocco': '0 0 40px -10px rgba(193, 39, 45, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background-color: #0f101c; 
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        /* Abstract Background Effects */
+        .hero-bg-wrapper {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 0%, #171846 0%, #0f101c 70%);
+        }
+        
+        .hero-image {
+            width: 100vw;
+            height: 120vh;
+            object-fit: contain;
+            object-position: top center;
+            opacity: 0.35;
+            mix-blend-mode: screen;
+            mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+            transform: scale(1.05) translateY(-5%);
+            animation: breathe 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1.02) translateY(-2%); }
+            100% { transform: scale(1.08) translateY(-4%); }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #a4bdfc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-nav {
+            background: rgba(15, 16, 28, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pillar-card {
+            background: linear-gradient(180deg, rgba(21, 22, 40, 0.8) 0%, rgba(15, 16, 28, 0.4) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .pillar-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(82, 102, 236, 0.4);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(82, 102, 236, 0.2);
+        }
+
+  :root {
+    --navy:   #0B1E3D;
+    --navy2:  #0D2448;
+    --blue:   #1A6FA8;
+    --blue2:  #2490D4;
+    --gold:   #C5922A;
+    --gold2:  #E8B856;
+    --cyan:   #00C8FF;
+    --text:   #E8EDF5;
+    --muted:  #7A99BB;
+    --grid:   rgba(26,111,168,0.08);
+  }
+
+  /* ── HERO SECTION ── */
+  .ar-hero {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: #040D1A;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: 'Exo 2', sans-serif;
+  }
+
+  /* Deep space background */
+  .ar-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(11,45,94,0.7) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(26,111,168,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 30% at 80% 70%, rgba(197,146,42,0.08) 0%, transparent 60%);
+    z-index: 0;
+  }
+
+  /* Tech grid overlay */
+  .ar-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(26,111,168,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,111,168,0.07) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 0;
+    animation: gridShift 30s linear infinite;
+  }
+
+  @keyframes gridShift {
+    from { background-position: 0 0; }
+    to   { background-position: 60px 60px; }
+  }
+
+  /* Scan line sweep */
+  .ar-scanline {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,200,255,0.4), transparent);
+    animation: scanSweep 6s ease-in-out infinite;
+    z-index: 1;
+  }
+  @keyframes scanSweep {
+    0%   { top: -2px; opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* Stars */
+  .ar-stars {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .ar-star {
+    position: absolute;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle var(--d, 3s) ease-in-out infinite;
+    opacity: var(--o, 0.4);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: var(--o, 0.4); transform: scale(1); }
+    50%      { opacity: 0.1; transform: scale(0.5); }
+  }
+
+  /* ── MOROCCAN BORDER BANDS ── */
+  .ar-border-top,
+  .ar-border-bottom {
+    position: absolute;
+    left: 0; right: 0;
+    height: 52px;
+    z-index: 2;
+    overflow: hidden;
+    background: #0B1E3D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+  }
+  .ar-border-top    { top: 0; border-top: none; padding-top: 25px; } /* Ajout padding pour la navbar ! */
+  .ar-border-bottom { bottom: 0; border-bottom: none; }
+
+  .ar-border-top svg,
+  .ar-border-bottom svg {
+    width: 100%;
+    height: 52px;
+    display: block;
+  }
+
+  /* ── CONTENT WRAPPER ── */
+  .ar-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 120px 40px 60px; /* Ajout padding depuis haut pour pas écraser navbar */
+    max-width: 1200px;
+    width: 100%;
+  }
+
+  /* ── BADGE ── */
+  .ar-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(197,146,42,0.5);
+    border-radius: 20px;
+    padding: 6px 18px;
+    margin-bottom: 32px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--gold2);
+    text-transform: uppercase;
+    animation: fadeDown 0.8s ease both;
+  }
+  .ar-badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold2);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(232,184,86,0.6); }
+    50%      { box-shadow: 0 0 0 6px rgba(232,184,86,0); }
+  }
+
+  /* ── MAIN LOGO ROW ── */
+  .ar-logo-row {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 28px;
+    animation: fadeUp 1s ease 0.2s both;
+  }
+
+  /* The emblem SVG */
+  .ar-emblem {
+    width: 160px;
+    height: 160px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 18px rgba(26,111,168,0.5));
+    animation: rotateSlow 40s linear infinite;
+  }
+  @keyframes rotateSlow {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .ar-emblem .inner { animation: rotateSlow 20s linear infinite reverse; transform-origin: center; }
+
+  .ar-wordmark {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .ar-wordmark-main {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    line-height: 1;
+  }
+  .ar-atlas {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(64px, 8vw, 110px);
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 4px;
+  }
+  .ar-rad {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(64px, 8vw, 110px);
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 4px;
+  }
+  .ar-underline {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold2) 70%, transparent 100%);
+    margin-top: 6px;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%,100% { opacity: 0.7; }
+    50%      { opacity: 1; }
+  }
+
+  /* ── TAGLINE ── */
+  .ar-tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(13px, 1.5vw, 16px);
+    font-weight: 500;
+    letter-spacing: 5px;
+    color: var(--blue2);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* ── HEADLINE ── */
+  .ar-headline {
+    font-family: 'Exo 2', sans-serif;
+    font-size: clamp(22px, 3.5vw, 44px);
+    font-weight: 200;
+    color: var(--text);
+    line-height: 1.35;
+    max-width: 780px;
+    margin-bottom: 16px;
+    animation: fadeUp 1s ease 0.4s both;
+    letter-spacing: 1px;
+  }
+  .ar-headline span {
+    color: var(--cyan);
+    font-weight: 400;
+  }
+
+  /* ── SUBTITLE ── */
+  .ar-subtitle {
+    font-size: clamp(14px, 1.6vw, 18px);
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 620px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    animation: fadeUp 1s ease 0.55s both;
+  }
+
+  /* ── CTA BUTTONS ── */
+  .ar-cta-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 70px;
+    animation: fadeUp 1s ease 0.7s both;
+  }
+
+  .ar-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 36px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+    color: #040D1A;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .ar-btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    transform: translateX(-110%) skewX(-15deg);
+    transition: transform 0.4s ease;
+  }
+  .ar-btn-primary:hover::after { transform: translateX(110%) skewX(-15deg); }
+  .ar-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(197,146,42,0.35); }
+
+  .ar-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 36px;
+    background: transparent;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid rgba(26,111,168,0.6);
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.3s, background 0.3s, transform 0.2s;
+  }
+  .ar-btn-secondary:hover {
+    border-color: var(--blue2);
+    background: rgba(26,111,168,0.12);
+    transform: translateY(-2px);
+  }
+
+  /* ── STATS ROW ── */
+  .ar-stats {
+    display: flex;
+    gap: 0;
+    border: 1px solid rgba(26,111,168,0.25);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: fadeUp 1s ease 0.85s both;
+    backdrop-filter: blur(6px);
+    background: rgba(11,30,61,0.4);
+  }
+  .ar-stat {
+    padding: 20px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid rgba(26,111,168,0.2);
+    min-width: 140px;
+  }
+  .ar-stat:last-child { border-right: none; }
+  .ar-stat-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--gold2);
+    line-height: 1;
+  }
+  .ar-stat-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── SIDE DECORATIONS ── */
+  .ar-side-left,
+  .ar-side-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    opacity: 0.25;
+  }
+  .ar-side-left  { left: 20px; }
+  .ar-side-right { right: 20px; transform: translateY(-50%) scaleX(-1); }
+
+  /* ── SCROLL INDICATOR ── */
+  .ar-scroll {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    animation: fadeUp 1s ease 1.2s both;
+  }
+  .ar-scroll-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .ar-scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--blue2), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%,100% { opacity: 0.3; transform: scaleY(1); }
+    50%      { opacity: 1;   transform: scaleY(1.1); }
+  }
+
+  /* ── CORNER MARKS ── */
+  .ar-corner {
+    position: absolute;
+    width: 40px; height: 40px;
+    z-index: 5;
+    opacity: 0.5;
+  }
+  .ar-corner-tl { top: 44px; left: 44px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+  .ar-corner-tr { top: 44px; right: 44px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+  .ar-corner-bl { bottom: 44px; left: 44px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+  .ar-corner-br { bottom: 44px; right: 44px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+
+  /* ── CIRCUIT LINES LEFT ── */
+  .ar-circuit {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.12;
+  }
+
+  /* animations */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity:0; transform:translateY(-16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .ar-logo-row { flex-direction: column; gap: 20px; }
+    .ar-wordmark { align-items: center; }
+    .ar-stats { flex-direction: column; }
+    .ar-stat { border-right: none; border-bottom: 1px solid rgba(26,111,168,0.2); }
+    .ar-stat:last-child { border-bottom: none; }
+    .ar-side-left, .ar-side-right { display: none; }
+  }
+
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 cursor-pointer flex items-center">
+                    <!-- L'astuce CSS (invert + mix-blend) permet d'enlever le fond blanc du logo sur notre site sombre -->
+                    <img src="logo.png" alt="AtlasRad Logo" class="h-10 md:h-12 object-contain" style="filter: invert(1) hue-rotate(180deg) brightness(1.4) contrast(1.2); mix-blend-mode: screen;">
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-10 items-center">
+                    <a href="#" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Workflows Agentiques</a>
+                    <a href="#" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Normalisation de Données</a>
+                    <a href="#" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">VNA Nouvelle Génération</a>
+                </div>
+
+                <!-- CTA -->
+                <div class="hidden md:flex flex-col items-end">
+                    <div class="flex items-center gap-2 text-xs font-bold text-morocco mb-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        Initiative Marocaine
+                    </div>
+                    <button class="bg-white text-brand-950 px-6 py-2 rounded-full text-sm font-bold hover:bg-gray-100 hover:shadow-glow transition-all duration-300 transform hover:-translate-y-0.5">
+                        Réserver une Démo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="ar-hero">
+
+  <!-- Background effects -->
+  <div class="ar-grid"></div>
+  <div class="ar-scanline"></div>
+  <div class="ar-stars" id="arStars"></div>
+
+  <!-- Circuit lines SVG -->
+  <svg class="ar-circuit" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+    <g stroke="#1A6FA8" stroke-width="1" fill="none">
+      <path d="M0,200 L120,200 L120,350 L280,350"/>
+      <path d="M0,500 L80,500 L80,420 L200,420 L200,480 L320,480"/>
+      <path d="M1440,150 L1300,150 L1300,280 L1180,280"/>
+      <path d="M1440,600 L1360,600 L1360,520 L1220,520 L1220,580 L1100,580"/>
+      <circle cx="120" cy="200" r="4" fill="#1A6FA8"/>
+      <circle cx="120" cy="350" r="3" fill="#1A6FA8"/>
+      <circle cx="80"  cy="500" r="4" fill="#1A6FA8"/>
+      <circle cx="200" cy="420" r="3" fill="#1A6FA8"/>
+      <circle cx="1300" cy="150" r="4" fill="#1A6FA8"/>
+      <circle cx="1300" cy="280" r="3" fill="#1A6FA8"/>
+      <circle cx="1360" cy="600" r="4" fill="#1A6FA8"/>
+      <circle cx="1220" cy="520" r="3" fill="#1A6FA8"/>
+    </g>
+    <!-- Moroccan diamond motifs in corners -->
+    <g stroke="#C5922A" stroke-width="0.8" fill="none" opacity="0.5">
+      <polygon points="60,60 90,40 120,60 90,80"/>
+      <polygon points="60,60 90,40 120,60 90,80" transform="rotate(45,90,60)"/>
+      <polygon points="1320,60 1350,40 1380,60 1350,80"/>
+      <polygon points="1320,60 1350,40 1380,60 1350,80" transform="rotate(45,1350,60)"/>
+      <polygon points="60,820 90,800 120,820 90,840"/>
+      <polygon points="60,820 90,800 120,820 90,840" transform="rotate(45,90,820)"/>
+      <polygon points="1320,820 1350,800 1380,820 1350,840"/>
+      <polygon points="1320,820 1350,800 1380,820 1350,840" transform="rotate(45,1350,820)"/>
+    </g>
+  </svg>
+
+  <!-- Moroccan border top -->
+  <div class="ar-border-top">
+    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <g id="nav-star">
+          <polygon points="0,-12 2,-2 12,0 2,2 0,12 -2,2 -12,0 -2,-2" fill="#9c7a38" />
+          <polygon points="0,-8 1.5,-1.5 8,0 1.5,1.5 0,8 -1.5,1.5 -8,0 -1.5,-1.5" fill="#9c7a38" transform="rotate(45)" />
+        </g>
+        <pattern id="star-pattern" x="0" y="0" width="80" height="52" patternUnits="userSpaceOnUse">
+          <use href="#nav-star" x="40" y="26" />
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="100%" height="100%" fill="#0B1E3D"/>
+      <rect x="0" y="0" width="100%" height="100%" fill="url(#star-pattern)"/>
+      <line x1="0" y1="51" x2="100%" y2="51" stroke="#C5922A" stroke-width="2" opacity="0.8"/>
+    </svg>
+  </div>
+
+  <!-- Corner marks -->
+  <div class="ar-corner ar-corner-tl"></div>
+  <div class="ar-corner ar-corner-tr"></div>
+  <div class="ar-corner ar-corner-bl"></div>
+  <div class="ar-corner ar-corner-br"></div>
+
+  <!-- Side decorations -->
+  <svg class="ar-side-left" width="30" height="300" viewBox="0 0 30 300">
+    <line x1="15" y1="0" x2="15" y2="300" stroke="#1A6FA8" stroke-width="1"/>
+    <g fill="#C5922A">
+      <polygon points="15,20 22,30 15,40 8,30"/>
+      <polygon points="15,80 22,90 15,100 8,90"/>
+      <polygon points="15,140 22,150 15,160 8,150"/>
+      <polygon points="15,200 22,210 15,220 8,210"/>
+      <polygon points="15,260 22,270 15,280 8,270"/>
+    </g>
+  </svg>
+  <svg class="ar-side-right" width="30" height="300" viewBox="0 0 30 300">
+    <line x1="15" y1="0" x2="15" y2="300" stroke="#1A6FA8" stroke-width="1"/>
+    <g fill="#C5922A">
+      <polygon points="15,20 22,30 15,40 8,30"/>
+      <polygon points="15,80 22,90 15,100 8,90"/>
+      <polygon points="15,140 22,150 15,160 8,150"/>
+      <polygon points="15,200 22,210 15,220 8,210"/>
+      <polygon points="15,260 22,270 15,280 8,270"/>
+    </g>
+  </svg>
+
+  <!-- Main content -->
+  <div class="ar-content">
+
+    <!-- Badge -->
+    <div class="ar-badge">
+      <span class="ar-badge-dot"></span>
+      Next-Generation Radiology Platform
+    </div>
+
+    <!-- Logo row -->
+    <div class="ar-logo-row">
+
+      <!-- Emblem SVG -->
+      <svg class="ar-emblem" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- 12pt Moroccan star outer -->
+        <polygon points="100,14 106,38 124,22 118,46 140,36 130,58 154,54 140,72 164,76 146,88 168,100 146,112 164,124 140,128 154,146 130,142 140,164 118,154 124,178 106,162 100,186 94,162 76,178 82,154 60,164 70,142 46,146 60,128 36,124 54,112 32,100 54,88 36,76 60,72 46,54 70,58 60,36 82,46 76,22 94,38"
+          fill="none" stroke="#C5922A" stroke-width="1.5" opacity="0.9"/>
+        <!-- Inner star -->
+        <polygon points="100,28 104,46 116,34 112,52 128,44 122,60 140,56 130,70 148,72 136,82 152,90 136,98 152,110 136,118 148,128 130,130 140,144 122,140 128,156 112,148 116,166 104,154 100,172 96,154 84,166 88,148 72,156 78,140 60,144 70,130 52,128 64,118 48,110 64,98 48,90 64,82 52,72 70,72 60,56 78,60 72,44 88,52 84,34 96,46"
+          fill="none" stroke="#C5922A" stroke-width="0.7" opacity="0.35"/>
+        <!-- Globe outer ring -->
+        <circle cx="100" cy="100" r="58" fill="none" stroke="#1A6FA8" stroke-width="2.5"/>
+        <!-- Meridian -->
+        <ellipse cx="100" cy="100" rx="32" ry="58" fill="none" stroke="#2490D4" stroke-width="1.8"/>
+        <!-- Equator -->
+        <ellipse cx="100" cy="100" rx="58" ry="20" fill="none" stroke="#2490D4" stroke-width="1.5"/>
+        <!-- Crosshair -->
+        <line x1="100" y1="56" x2="100" y2="144" stroke="#E8EDF5" stroke-width="3" stroke-linecap="round"/>
+        <line x1="56"  y1="100" x2="144" y2="100" stroke="#E8EDF5" stroke-width="3" stroke-linecap="round"/>
+        <!-- Center dot -->
+        <circle cx="100" cy="100" r="7" fill="#00C8FF"/>
+        <!-- Pulse dots -->
+        <circle cx="100" cy="74"  r="3" fill="#2490D4" opacity="0.8"/>
+        <circle cx="100" cy="126" r="3" fill="#2490D4" opacity="0.8"/>
+        <circle cx="74"  cy="100" r="3" fill="#2490D4" opacity="0.8"/>
+        <circle cx="126" cy="100" r="3" fill="#2490D4" opacity="0.8"/>
+        <!-- AI neural nodes (8 at r=72) -->
+        <g class="inner">
+          <circle cx="100"   cy="28"  r="4" fill="#C5922A"/>
+          <circle cx="151"   cy="51"  r="4" fill="#C5922A"/>
+          <circle cx="172"   cy="100" r="4" fill="#C5922A"/>
+          <circle cx="151"   cy="149" r="4" fill="#C5922A"/>
+          <circle cx="100"   cy="172" r="4" fill="#C5922A"/>
+          <circle cx="49"    cy="149" r="4" fill="#C5922A"/>
+          <circle cx="28"    cy="100" r="4" fill="#C5922A"/>
+          <circle cx="49"    cy="51"  r="4" fill="#C5922A"/>
+          <!-- connections -->
+          <line x1="100" y1="28"  x2="151" y2="51"  stroke="#C5922A" stroke-width="0.8" opacity="0.6"/>
+          <line x1="151" y1="51"  x2="172" y2="100" stroke="#C5922A" stroke-width="0.8" opacity="0.6"/>
+          <line x1="172" y1="100" x2="151" y2="149" stroke="#C5922A" stroke-width="0.8" opacity="0.6"/>
+          <line x1="151" y1="149" x2="100" y2="172" stroke="#C5922A" stroke-width="0.8" opacity="0.6"/>
+          <line x1="100" y1="172" x2="49"  y2="149" stroke="#C5922A" stroke-width="0.8" opacity="0.6"/>
+          <line x1="49"  y1="149" x2="28"  y2="100" stroke="#C5922A" stroke-width="0.8" opacity="0.6"/>
+          <line x1="28"  y1="100" x2="49"  y2="51"  stroke="#C5922A" stroke-width="0.8" opacity="0.6"/>
+          <line x1="49"  y1="51"  x2="100" y2="28"  stroke="#C5922A" stroke-width="0.8" opacity="0.6"/>
+          <!-- skip-one -->
+          <line x1="100" y1="28"  x2="172" y2="100" stroke="#C5922A" stroke-width="0.4" opacity="0.25"/>
+          <line x1="172" y1="100" x2="100" y2="172" stroke="#C5922A" stroke-width="0.4" opacity="0.25"/>
+          <line x1="100" y1="172" x2="28"  y2="100" stroke="#C5922A" stroke-width="0.4" opacity="0.25"/>
+          <line x1="28"  y1="100" x2="100" y2="28"  stroke="#C5922A" stroke-width="0.4" opacity="0.25"/>
+        </g>
+      </svg>
+
+      <!-- Wordmark -->
+      <div class="ar-wordmark">
+        <div class="ar-wordmark-main">
+          <span class="ar-atlas">ATLAS</span>
+          <span class="ar-rad">RAD</span>
+        </div>
+        <div class="ar-underline"></div>
+        <div class="ar-tagline">AI-Powered Medical Imaging</div>
+      </div>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="ar-headline">
+      Precision Imaging. <span>Intelligent Diagnosis.</span><br>Built for the Future of Radiology.
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="ar-subtitle">
+      ATLASRAD combines advanced AI with Moroccan medical expertise to deliver
+      cutting-edge radiology solutions — empowering radiologists, technicians,
+      and healthcare teams with next-generation imaging intelligence.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="ar-cta-row">
+      <a href="#" class="ar-btn-primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="7" stroke="#040D1A" stroke-width="1.5"/>
+          <path d="M6 5l4 3-4 3" stroke="#040D1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Discover Platform
+      </a>
+      <a href="#" class="ar-btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="2" width="12" height="12" rx="2" stroke="#E8EDF5" stroke-width="1.5"/>
+          <path d="M5 8h6M8 5v6" stroke="#E8EDF5" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Request a Demo
+      </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="ar-stats">
+      <div class="ar-stat">
+        <div class="ar-stat-num">99.2<span style="font-size:18px;color:#C5922A">%</span></div>
+        <div class="ar-stat-label">AI Accuracy</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-num">3<span style="font-size:18px;color:#C5922A">s</span></div>
+        <div class="ar-stat-label">Analysis Time</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-num">50<span style="font-size:18px;color:#C5922A">+</span></div>
+        <div class="ar-stat-label">Imaging Types</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-num">24<span style="font-size:18px;color:#C5922A">/7</span></div>
+        <div class="ar-stat-label">Availability</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Moroccan border bottom -->
+  <div class="ar-border-bottom">
+    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <g id="nav-star">
+          <polygon points="0,-12 2,-2 12,0 2,2 0,12 -2,2 -12,0 -2,-2" fill="#9c7a38" />
+          <polygon points="0,-8 1.5,-1.5 8,0 1.5,1.5 0,8 -1.5,1.5 -8,0 -1.5,-1.5" fill="#9c7a38" transform="rotate(45)" />
+        </g>
+        <pattern id="star-pattern" x="0" y="0" width="80" height="52" patternUnits="userSpaceOnUse">
+          <use href="#nav-star" x="40" y="26" />
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="100%" height="100%" fill="#0B1E3D"/>
+      <rect x="0" y="0" width="100%" height="100%" fill="url(#star-pattern)"/>
+      <line x1="0" y1="1" x2="100%" y2="1" stroke="#C5922A" stroke-width="2" opacity="0.8"/>
+    </svg>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="ar-scroll">
+    <span class="ar-scroll-label">Scroll</span>
+    <div class="ar-scroll-line"></div>
+  </div>
+
+</section>
+
+
+    <!-- Core Technologies Grid -->
+    <section class="py-24 bg-surface relative z-10 border-t border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-20 flex flex-col items-center">
+                <div class="w-16 h-1 bg-gradient-to-r from-morocco to-transparent mb-6 rounded-full"></div>
+                <h3 class="text-3xl md:text-5xl font-bold text-white">Construit par un Manipulateur Radio.</h3>
+                <h3 class="text-3xl md:text-5xl font-bold text-gray-500 mt-2">Conçu pour l'Entreprise.</h3>
+                <p class="mt-6 text-gray-400 max-w-2xl mx-auto text-lg">
+                    Nous résolvons les problèmes d'infrastructure massifs et invisibles qui freinent l'adoption de l'IA clinique. Nous nous concentrons sur les données locales désordonnées et les workflows brisés pour que vous n'ayez pas à le faire.
+                </p>
+            </div>
+
+            <!-- Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Data Normalization -->
+                <div class="pillar-card rounded-2xl p-10 flex flex-col group">
+                    <div class="w-16 h-16 rounded-xl bg-brand-900/50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-4">Normalisation Approfondie des Données</h4>
+                    <p class="text-gray-400 leading-relaxed">
+                        Les données médicales sont désordonnées à travers les réseaux hospitaliers. Notre pipeline standardise, nettoie et normalise les métadonnées DICOM non structurées avant même qu'un algorithme d'IA ne tente de les analyser. Fini les erreurs logicielles dues aux discordances de protocoles.
+                    </p>
+                </div>
+
+                <!-- Agentic Workflows -->
+                <div class="pillar-card rounded-2xl p-10 flex flex-col group">
+                    <div class="w-16 h-16 rounded-xl bg-brand-900/50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-4">Workflows Agentiques en Radiologie</h4>
+                    <p class="text-gray-400 leading-relaxed">
+                        Faire passer l'IA d'un simple "deuxième lecteur" passif à un agent clinique proactif. Notre couche d'intelligence orchestre votre travail en récupérant activement les images antérieures, en résumant l'historique médical, et en pré-traitant les examens en arrière-plan.
+                    </p>
+                </div>
+
+                <!-- Next-Gen VNA -->
+                <div class="pillar-card rounded-2xl p-10 flex flex-col group">
+                    <div class="w-16 h-16 rounded-xl bg-brand-900/50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-4">Le VNA du Futur</h4>
+                    <p class="text-gray-400 leading-relaxed">
+                        Plus qu'une simple archive — c'est un moteur de routage dynamique. Notre VNA Nouvelle Génération interprète les examens entrants et achemine activement les séries DICOM qualifiées vers les différents algorithmes d'IA de manière totalement simultanée, soulageant ainsi votre département informatique.
+                    </p>
+                </div>
+
+                <!-- Unified Interface -->
+                <div class="pillar-card rounded-2xl p-10 flex flex-col group">
+                    <div class="w-16 h-16 rounded-xl bg-brand-900/50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-4">Visionneuse Clinique Intégrée</h4>
+                    <p class="text-gray-400 leading-relaxed">
+                        Arrêtez de jongler entre des logiciels fragmentés de différents fournisseurs. Nos résultats d'IA sont affichés nativement dans l'environnement de visualisation principal du radiologue, en transparence totale (zero-footprint).
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Mock Dashboard Visualization -->
+    <section class="py-24 bg-[#111220] relative border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2">
+                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-6">L'Orchestration en Action</h3>
+                    <p class="text-gray-400 text-lg mb-8 leading-relaxed">
+                        Regardez notre infrastructure VNA Nouvelle Génération acheminer, normaliser et traiter activement les examens des patients à travers plusieurs modèles d'IA spécialisés en quelques secondes.
+                    </p>
+                    <div class="bg-card rounded-xl border border-gray-800 p-6 shadow-2xl relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-800">
+                            <span class="text-sm font-semibold text-white flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                Processus d'Agent Actif
+                            </span>
+                            <span class="px-2 py-1 rounded bg-brand-900/50 text-brand-400 text-xs font-mono">ROUTAGE_EN_DIRECT</span>
+                        </div>
+                        
+                        <!-- Dynamic Terminal Area -->
+                        <div id="vna-terminal" class="space-y-4 font-mono text-sm h-48 overflow-y-auto mb-6 pr-2 scroll-smooth">
+                            <div class="flex items-center text-sm font-mono opacity-50 h-full justify-center">
+                                <span class="text-gray-400">Système en attente d'un nouvel examen DICOM...</span>
+                            </div>
+                        </div>
+
+                        <button id="btn-simulate" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-600/20 hover:bg-brand-600/40 text-brand-300 hover:text-white border border-brand-500/30 rounded font-semibold text-sm transition-all focus:outline-none">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                            Intercepter et Router un Examen
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Graphic Representation -->
+                <div class="lg:w-1/2 w-full flex justify-center">
+                    <div class="relative w-full max-w-md aspect-square rounded-full border border-gray-800 flex items-center justify-center">
+                        <div class="absolute w-[80%] h-[80%] rounded-full border border-gray-700/50 animate-[spin_20s_linear_infinite]"></div>
+                        <div class="absolute w-[60%] h-[60%] rounded-full border border-brand-500/30 animate-[spin_15s_linear_infinite_reverse]"></div>
+                        
+                        <div id="vna-core" class="w-32 h-32 rounded-full bg-gradient-to-br from-brand-500 to-brand-800 flex flex-col items-center justify-center shadow-glow-intense z-10 relative transition-all duration-300">
+                            <svg class="w-10 h-10 text-white mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            <span class="text-[0.6rem] font-bold text-white uppercase tracking-widest leading-none">VNA Actif</span>
+                        </div>
+                        
+                        <!-- Orbiting Nodes -->
+                        <div id="node-ai-1" class="absolute top-[10%] left-[20%] w-12 h-12 rounded-full bg-surface border border-gray-700 flex items-center justify-center shadow-lg transition-all duration-300"><span class="text-xs text-brand-400 font-bold z-20 relative">IA 1</span></div>
+                        <div id="node-ai-2" class="absolute bottom-[20%] right-[10%] w-12 h-12 rounded-full bg-surface border border-gray-700 flex items-center justify-center shadow-lg transition-all duration-300"><span class="text-xs text-brand-400 font-bold z-20 relative">IA 2</span></div>
+                        <div id="node-ai-3" class="absolute top-[40%] right-[5%] w-12 h-12 rounded-full bg-surface border border-gray-700 flex items-center justify-center shadow-lg transition-all duration-300"><span class="text-xs text-brand-400 font-bold z-20 relative">IA 3</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <footer class="bg-[#0f101c] py-20 border-t border-gray-800 relative z-10 text-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="w-16 h-1 bg-gradient-to-r from-morocco to-transparent mx-auto mb-8 rounded-full"></div>
+            <h2 class="text-3xl lg:text-5xl font-bold text-white mb-6">Construit au Maroc. <br/> Déployé pour le Monde.</h2>
+            <p class="text-gray-400 mb-10 text-lg">Conçu de A à Z par un manipulateur radio clinique qui comprend les véritables frictions des déploiements PACS, DICOM et d'entreprise sur le terrain.</p>
+            <button class="px-8 py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-lg font-bold text-lg hover:shadow-glow-intense transition-all transform hover:-translate-y-1">
+                Devenir Partenaire
+            </button>
+            <div class="mt-20 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-gray-500">
+                <div class="text-sm">
+                    &copy; 2026 AtlasRad Solutions. Tous droits réservés.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar glass effect on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                nav.style.backgroundColor = 'rgba(15, 16, 28, 0.9)';
+                nav.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+            } else {
+                nav.style.backgroundColor = 'rgba(15, 16, 28, 0.7)';
+                nav.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
+            }
+        });
+    </script>
+
+    <script>
+        // VNA Interactive Simulation Logic
+        const btnSimulate = document.getElementById('btn-simulate');
+        const terminal = document.getElementById('vna-terminal');
+        const core = document.getElementById('vna-core');
+        const nodes = [
+            document.getElementById('node-ai-1'),
+            document.getElementById('node-ai-2'),
+            document.getElementById('node-ai-3')
+        ];
+
+        const simulateRouting = async () => {
+            if (btnSimulate.disabled) return;
+            
+            btnSimulate.disabled = true;
+            btnSimulate.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Traitement en cours...`;
+            terminal.innerHTML = "";
+            
+            const getTime = () => {
+                const now = new Date();
+                return `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}s`;
+            };
+
+            const addLog = (iconHtml, text, colorClass) => {
+                const div = document.createElement('div');
+                div.className = "flex items-start mb-3" + (colorClass ? ` ${colorClass}` : "");
+                div.style.animation = "fade-in 0.3s ease-out forwards";
+                div.innerHTML = `
+                    <div class="mr-3 mt-0.5">${iconHtml}</div>
+                    <span class="text-gray-500 w-24 shrink-0">[${getTime()}]</span>
+                    <span class="flex-1">${text}</span>
+                `;
+                terminal.appendChild(div);
+                terminal.scrollTop = terminal.scrollHeight;
+            };
+
+            const delay = ms => new Promise(r => setTimeout(r, ms));
+
+            // Reset UI
+            core.classList.remove('shadow-[0_0_50px_rgba(82,102,236,0.8)]');
+            nodes.forEach(n => {
+                n.classList.remove('bg-brand-600', 'border-brand-400', 'shadow-[0_0_20px_rgba(82,102,236,0.8)]');
+                n.classList.remove('scale-125');
+            });
+
+            // Step 1: Ingestion
+            addLog('<span class="text-blue-400">📥</span>', "Interception d'une nouvelle étude DICOM (IRM Cérébrale)...", "text-blue-300");
+            await delay(1200);
+
+            // Step 2: Normalization
+            addLog('<span class="text-yellow-500 animate-spin inline-block">⟳</span>', "Agent : Nettoyage & Normalisation des métadonnées (Patient_ID, Study_Date)...", "text-gray-300");
+            core.classList.add('shadow-[0_0_50px_rgba(82,102,236,0.8)]');
+            await delay(1500);
+
+            // Step 3: Prioritization
+            addLog('<span class="text-purple-400">🧠</span>', "Agent : Analyse de l'historique clinique. Patient identifié à haut risque d'AVC.", "text-purple-300");
+            await delay(1000);
+
+            // Step 4: Routing
+            addLog('<span class="text-brand-400 font-bold">➤</span>', "Acheminement PRIORITAIRE vers Neuro-Stroke-Net (IA 1)", "text-white font-semibold");
+            nodes[0].classList.add('bg-brand-600', 'border-brand-400', 'shadow-[0_0_20px_rgba(82,102,236,0.8)]', 'scale-125', 'z-50');
+            await delay(2000);
+
+            // Step 5: Success
+            nodes[0].classList.remove('scale-125', 'z-50');
+            nodes[0].classList.add('opacity-50');
+            setTimeout(() => nodes[0].classList.remove('opacity-50'), 400);
+
+            addLog('<span class="text-green-500">✓</span>', "Inférence terminée. Résultats urgents poussés et visualisés (2.4s).", "text-green-400 font-medium");
+            
+            await delay(500);
+            btnSimulate.disabled = false;
+            btnSimulate.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg> Intercepter un Autre Examen`;
+        };
+
+        if(btnSimulate) btnSimulate.addEventListener('click', simulateRouting);
+
+        // Video Autoplay & Mute Toggle Logic
+        const aiVideo = document.getElementById('ai-video');
+        const unmuteBtn = document.getElementById('unmute-btn');
+        const iconMuted = document.getElementById('icon-muted');
+        const iconUnmuted = document.getElementById('icon-unmuted');
+
+        if(unmuteBtn && aiVideo) {
+            unmuteBtn.addEventListener('click', () => {
+                if(aiVideo.muted) {
+                    aiVideo.muted = false;
+                    iconMuted.classList.add('hidden');
+                    iconUnmuted.classList.remove('hidden');
+                } else {
+                    aiVideo.muted = true;
+                    iconMuted.classList.remove('hidden');
+                    iconUnmuted.classList.add('hidden');
+                }
+            });
+            
+            // Allow clicking the video itself to toggle play/pause since controls are hidden
+            aiVideo.addEventListener('click', () => {
+                if(aiVideo.paused) aiVideo.play();
+                else aiVideo.pause();
+            });
+        }
+    </script>
+    <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</body>
+</html>
