@@ -6,24 +6,57 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 import time
+import sqlite3
 
-# 1. Création de l'application (Le Cerveau)
+# --- 0. INITIALISATION DE LA BASE DE DONNÉES SQLITE ---
+def init_db():
+    # Crée un fichier atlasrad.db automatiquement (la base de données)
+    conn = sqlite3.connect("atlasrad.db")
+    cursor = conn.cursor()
+    
+    # Création de la table des médecins (si elle n'existe pas encore)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS medecins (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nom TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL
+        )
+    ''')
+    
+    # On ajoute au moins le compte Administrateur (Sabir) s'il n'y est pas
+    cursor.execute("SELECT * FROM medecins WHERE email = 'sabir@atlasrad.com'")
+    if not cursor.fetchone():
+        cursor.execute('''
+            INSERT INTO medecins (nom, email, password, role)
+            VALUES ('Sabir', 'sabir@atlasrad.com', 'admin123', 'Administrateur Système VNA')
+        ''')
+        print("[DATABASE] Compte Admin (Sabir) créé avec succès !")
+    
+    conn.commit()
+    conn.close()
+
+# Lancement de l'initialisation DB dès l'allumage du serveur
+init_db()
+
+
+# --- 1. CONFIGURATION DU MOTEUR FASTAPI ---
 app = FastAPI(
     title="AtlasRad VNA API", 
     description="Moteur de routage DICOM et d'authentification clinique",
     version="1.0.0"
 )
 
-# 2. Autoriser notre site web (Frontend) à parler avec ce serveur
+# Autorise notre HTML public à interagir avec le Cerveau (CORS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # En production, on mettra l'URL exacte du site Github
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 3. Structure de données attendue pour la connexion
 class LoginDemande(BaseModel):
     email: str
     password: str
@@ -32,31 +65,43 @@ class LoginDemande(BaseModel):
 
 @app.get("/")
 def verifier_systeme():
-    """Vérifie que le serveur est bien allumé"""
+    """Route pour vérifier que le port 8000 est bien vivant"""
     return {
         "status": "online",
         "system": "AtlasRad - Cerveau Actif",
+        "database": "SQLite connectée",
         "heure_serveur": time.time()
     }
 
 @app.post("/api/login")
 def connexion_clinique(demande: LoginDemande):
-    """Vérifie l'identité du médecin dans notre base de données"""
+    """Vérifie l'identité du médecin directement dans la base de données SQL"""
+    print(f"[AUTH] Requête de connexion SQL pour : {demande.email}")
     
-    # Simulation d'une vérification sécurisée
-    email_valide = "dr.sabir@chu-ibnrochd.ma"
-    mdp_valide = "admin123"
+    # On se connecte à la DB "atlasrad.db"
+    conn = sqlite3.connect("atlasrad.db")
+    cursor = conn.cursor()
     
-    print(f"[AUTH] Tentative de connexion pour : {demande.email}")
+    # On cherche dans la table "medecins" une ligne avec le mail ET le mot de passe
+    cursor.execute(
+        "SELECT nom, role FROM medecins WHERE email = ? AND password = ?", 
+        (demande.email, demande.password)
+    )
+    utilisateur = cursor.fetchone() # Fetchone() récupère la ligne trouvée (ou "None" si vide)
+    conn.close()
     
-    if demande.email == email_valide and demande.password == mdp_valide:
-        print("[AUTH] Accès Autorisé. Génération du Token.")
+    # Si "utilisateur" n'est pas vide = Le mot de passe est BON
+    if utilisateur:
+        nom_complet, role_user = utilisateur
+        print(f"[AUTH] Accès Autorisé. Bonjour {nom_complet} ({role_user})")
         return {
             "token": "atlasrad_secure_token_98213",
-            "message": "Bienvenue Dr. Sabir",
-            "redirect": "/dashboard.html"
+            "message": f"Bienvenue {nom_complet}",
+            "role": role_user,
+            "redirect": "dashboard.html" # Indique à JavaScript (login.html) d'aller sur le Dashboard
         }
     else:
+        # Si la ligne n'existe pas en DB, on rejette sèchement (Erreur 401)
         print("[AUTH] Accès Refusé. Identifiants incorrects.")
         raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect.")
 
@@ -66,6 +111,7 @@ def connexion_clinique(demande: LoginDemande):
 if __name__ == "__main__":
     print("="*50)
     print("🚀 DÉMARRAGE DU MOTEUR CENTRAL ATLASRAD...")
+    print("💽 BASE DE DONNÉES (SQLite): CONNECTÉE")
     print("🏥 Serveur en écoute sur le Réseau (Port 8000)")
     print("="*50)
     
