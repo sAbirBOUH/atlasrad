@@ -207,8 +207,10 @@
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-2xl font-bold font-['Exo_2']">Vue Active du Routeur VNA</h2>
                 <div class="flex gap-2">
-                    <button class="px-4 py-2 border border-[#1A6FA8] text-[#1A6FA8] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#1A6FA8]/10 transition">Suspendre Réception</button>
-                    <button class="px-4 py-2 bg-gradient-to-r from-[#C5922A] to-[#E8B856] text-[#040D1A] rounded-lg text-xs font-bold uppercase tracking-widest hover:shadow-[0_0_15px_rgba(197,146,42,0.4)] transition">Forcer le Routage IA</button>
+                    <button onclick="openUploadModal()" class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#C5922A] to-[#E8B856] text-[#040D1A] rounded-lg text-xs font-bold uppercase tracking-widest hover:shadow-[0_0_20px_rgba(197,146,42,0.5)] transition transform hover:-translate-y-0.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        Nouvelle Analyse IA
+                    </button>
                 </div>
             </div>
 
@@ -556,6 +558,295 @@
             </div>
         </div>
     </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!--        MODAL : NOUVELLE ANALYSE IA       -->
+    <!-- ════════════════════════════════════════ -->
+    <div id="uploadModal" class="hidden fixed inset-0 flex items-center justify-center bg-black/85 backdrop-blur-xl" style="z-index:9998;">
+        <div class="bg-[#040D1A] border border-[#C5922A]/40 rounded-2xl w-[95vw] max-w-xl shadow-[0_0_60px_rgba(197,146,42,0.15)] overflow-hidden">
+
+            <!-- Header -->
+            <div class="h-14 bg-[#0B1E3D] border-b border-[#1A6FA8]/30 flex items-center justify-between px-6">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-[#C5922A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    <span class="font-['Rajdhani'] font-bold text-white uppercase tracking-widest text-sm">Nouvelle Analyse IA</span>
+                </div>
+                <button onclick="closeUploadModal()" class="text-gray-400 hover:text-white p-1 rounded hover:bg-white/10 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-8">
+
+                <!-- Step indicator -->
+                <div class="flex items-center gap-2 mb-6" id="stepIndicator">
+                    <div class="flex items-center gap-1.5 step-item active" id="step1-ind">
+                        <div class="w-6 h-6 rounded-full bg-[#C5922A] text-[#040D1A] text-xs font-bold flex items-center justify-center">1</div>
+                        <span class="text-xs text-[#C5922A] font-bold uppercase tracking-widest">Upload</span>
+                    </div>
+                    <div class="flex-1 h-px bg-gray-700 mx-1"></div>
+                    <div class="flex items-center gap-1.5 step-item" id="step2-ind">
+                        <div class="w-6 h-6 rounded-full bg-gray-700 text-gray-400 text-xs font-bold flex items-center justify-center">2</div>
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-widest">Analyse IA</span>
+                    </div>
+                    <div class="flex-1 h-px bg-gray-700 mx-1"></div>
+                    <div class="flex items-center gap-1.5 step-item" id="step3-ind">
+                        <div class="w-6 h-6 rounded-full bg-gray-700 text-gray-400 text-xs font-bold flex items-center justify-center">3</div>
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-widest">Résultats</span>
+                    </div>
+                </div>
+
+                <!-- STEP 1: Upload form -->
+                <div id="uploadStep">
+                    <!-- Drop Zone -->
+                    <div id="dropZone"
+                        class="border-2 border-dashed border-[#1A6FA8]/50 rounded-xl p-10 text-center cursor-pointer hover:border-[#C5922A] hover:bg-[#C5922A]/5 transition-all group mb-6"
+                        onclick="document.getElementById('fileInput').click()"
+                        ondrop="handleDrop(event)" ondragover="event.preventDefault()" ondragleave="dropZone.classList.remove('border-[#C5922A]','bg-[#C5922A]/5')">
+                        <svg class="w-12 h-12 mx-auto text-[#1A6FA8] group-hover:text-[#C5922A] transition-colors mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p class="text-white font-bold mb-1">Glissez votre image ici</p>
+                        <p class="text-xs text-[#7A99BB]">ou cliquez pour sélectionner — JPEG, PNG (max 20MB)</p>
+                        <div id="fileNameDisplay" class="mt-3 text-xs text-[#C5922A] font-bold hidden"></div>
+                    </div>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="handleFileSelect(event)">
+
+                    <!-- Metadata fields -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs text-[#7A99BB] uppercase tracking-widest mb-1.5">Modalité</label>
+                            <select id="modalityInput" class="w-full bg-[#040D1A] border border-[#1A6FA8]/40 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C5922A]">
+                                <option value="CT">CT Scan</option>
+                                <option value="MR">IRM / MRI</option>
+                                <option value="CR">Radiographie</option>
+                                <option value="US">Échographie</option>
+                                <option value="PT">PET Scan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-[#7A99BB] uppercase tracking-widest mb-1.5">ID Patient (Anonymisé)</label>
+                            <input type="text" id="patientIdInput" placeholder="AR-2026-0001" class="w-full bg-[#040D1A] border border-[#1A6FA8]/40 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C5922A] placeholder-gray-600">
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-xs text-[#7A99BB] uppercase tracking-widest mb-1.5">Description de l'examen</label>
+                        <input type="text" id="descriptionInput" placeholder="Ex: Scanner Cerebral Sans Injection, IRM Thorax..." class="w-full bg-[#040D1A] border border-[#1A6FA8]/40 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C5922A] placeholder-gray-600">
+                    </div>
+
+                    <div id="uploadError" class="hidden text-red-400 text-xs bg-red-900/20 border border-red-500/30 rounded-lg px-4 py-2 mb-4"></div>
+
+                    <button id="uploadBtn" onclick="submitUpload()" class="w-full py-3.5 bg-gradient-to-r from-[#C5922A] to-[#E8B856] text-[#040D1A] rounded-lg font-['Rajdhani'] font-bold uppercase tracking-widest hover:shadow-[0_0_25px_rgba(197,146,42,0.4)] transition-all">
+                        Uploader &amp; Lancer l'Analyse IA →
+                    </button>
+                </div>
+
+                <!-- STEP 2: Processing -->
+                <div id="processingStep" class="hidden text-center py-10">
+                    <div class="w-20 h-20 mx-auto mb-6 relative">
+                        <svg class="animate-spin w-20 h-20 text-[#1A6FA8]" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"></circle>
+                            <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-7 h-7 text-[#C5922A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        </div>
+                    </div>
+                    <p id="processingText" class="text-white font-bold text-lg mb-2">Upload en cours...</p>
+                    <p class="text-[#7A99BB] text-sm">Le moteur IA analyse les métadonnées DICOM</p>
+                </div>
+
+                <!-- STEP 3: Results -->
+                <div id="resultsStep" class="hidden">
+                    <div class="bg-[#0B1E3D] border border-[#00FF9D]/30 rounded-xl p-6 mb-4 text-center">
+                        <div class="w-12 h-12 rounded-full bg-[#00FF9D]/20 border border-[#00FF9D] mx-auto flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6 text-[#00FF9D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <h3 class="text-white font-bold text-lg mb-1">Analyse IA Terminée !</h3>
+                        <p id="resultModelName" class="text-[#00C8FF] text-xs font-bold uppercase tracking-widest mb-4"></p>
+
+                        <div class="text-left space-y-3">
+                            <div class="flex justify-between items-center bg-[#040D1A] rounded-lg px-4 py-3">
+                                <span class="text-xs text-[#7A99BB] uppercase tracking-wider">Résultat</span>
+                                <span id="resultText" class="text-sm text-white font-semibold text-right max-w-[60%]"></span>
+                            </div>
+                            <div class="flex justify-between items-center bg-[#040D1A] rounded-lg px-4 py-3">
+                                <span class="text-xs text-[#7A99BB] uppercase tracking-wider">Confiance</span>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-24 h-2 bg-gray-800 rounded-full overflow-hidden">
+                                        <div id="confidenceBar" class="h-full bg-gradient-to-r from-[#C5922A] to-[#00FF9D] rounded-full transition-all duration-1000" style="width:0%"></div>
+                                    </div>
+                                    <span id="confidenceText" class="text-[#E8B856] font-bold font-['Rajdhani'] text-lg"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p id="resultFinding" class="text-gray-400 text-xs leading-relaxed mt-4 text-left bg-[#040D1A] rounded-lg p-3 border border-[#1A6FA8]/20"></p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="resetUploadModal()" class="flex-1 border border-[#1A6FA8] text-[#00C8FF] rounded-lg py-2.5 text-sm font-bold hover:bg-[#1A6FA8]/20 transition-colors">Nouvelle Analyse</button>
+                        <button onclick="closeUploadModal(); fetchExams();" class="flex-1 bg-[#C5922A] text-[#040D1A] rounded-lg py-2.5 text-sm font-bold hover:shadow-[0_0_20px_rgba(197,146,42,0.4)] transition-colors">Voir dans le Dashboard ✓</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Upload Modal Logic ──
+        let selectedFile = null;
+
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function resetUploadModal() {
+            selectedFile = null;
+            document.getElementById('fileNameDisplay').classList.add('hidden');
+            document.getElementById('fileInput').value = '';
+            document.getElementById('descriptionInput').value = '';
+            document.getElementById('patientIdInput').value = '';
+            document.getElementById('uploadError').classList.add('hidden');
+            document.getElementById('uploadStep').classList.remove('hidden');
+            document.getElementById('processingStep').classList.add('hidden');
+            document.getElementById('resultsStep').classList.add('hidden');
+            // Reset step indicators
+            ['step1-ind','step2-ind','step3-ind'].forEach((id,i) => {
+                const el = document.getElementById(id);
+                const dot = el.querySelector('div');
+                const label = el.querySelector('span');
+                if (i === 0) {
+                    dot.className = 'w-6 h-6 rounded-full bg-[#C5922A] text-[#040D1A] text-xs font-bold flex items-center justify-center';
+                    label.className = 'text-xs text-[#C5922A] font-bold uppercase tracking-widest';
+                } else {
+                    dot.className = 'w-6 h-6 rounded-full bg-gray-700 text-gray-400 text-xs font-bold flex items-center justify-center';
+                    label.className = 'text-xs text-gray-500 font-bold uppercase tracking-widest';
+                }
+            });
+        }
+
+        function activateStep(stepNum) {
+            ['step1-ind','step2-ind','step3-ind'].forEach((id,i) => {
+                const el = document.getElementById(id);
+                const dot = el.querySelector('div');
+                const label = el.querySelector('span');
+                if (i < stepNum) {
+                    dot.className = 'w-6 h-6 rounded-full bg-[#00FF9D] text-[#040D1A] text-xs font-bold flex items-center justify-center';
+                    label.className = 'text-xs text-[#00FF9D] font-bold uppercase tracking-widest';
+                } else if (i === stepNum) {
+                    dot.className = 'w-6 h-6 rounded-full bg-[#C5922A] text-[#040D1A] text-xs font-bold flex items-center justify-center';
+                    label.className = 'text-xs text-[#C5922A] font-bold uppercase tracking-widest';
+                } else {
+                    dot.className = 'w-6 h-6 rounded-full bg-gray-700 text-gray-400 text-xs font-bold flex items-center justify-center';
+                    label.className = 'text-xs text-gray-500 font-bold uppercase tracking-widest';
+                }
+            });
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            if (file) setFile(file);
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) setFile(file);
+        }
+
+        function setFile(file) {
+            selectedFile = file;
+            const display = document.getElementById('fileNameDisplay');
+            display.textContent = '📎 ' + file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+            display.classList.remove('hidden');
+        }
+
+        async function submitUpload() {
+            if (!selectedFile) {
+                const err = document.getElementById('uploadError');
+                err.textContent = '⚠️ Veuillez sélectionner une image avant de continuer.';
+                err.classList.remove('hidden');
+                return;
+            }
+
+            const token = localStorage.getItem('atlasrad_access_token');
+            const description = document.getElementById('descriptionInput').value || 'Examen Non Décrit';
+            const modality = document.getElementById('modalityInput').value;
+            const patientId = document.getElementById('patientIdInput').value || 'ANONYMIZED';
+
+            // --- ÉTAPE 1 → 2 : Upload ---
+            document.getElementById('uploadStep').classList.add('hidden');
+            document.getElementById('processingStep').classList.remove('hidden');
+            activateStep(1);
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+            formData.append('modality', modality);
+            formData.append('description', description);
+            formData.append('patient_id', patientId);
+
+            try {
+                const uploadRes = await fetch('http://127.0.0.1:8000/api/analyses/upload/', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    body: formData
+                });
+
+                const uploadData = await uploadRes.json();
+                if (!uploadRes.ok) throw new Error(uploadData.message || 'Erreur upload');
+
+                const analysisId = uploadData.analysis_id;
+
+                // --- ÉTAPE 2 → 3 : Analyse IA ---
+                document.getElementById('processingText').textContent = 'Moteur IA en cours d\'analyse...';
+                activateStep(2);
+
+                const analyzeRes = await fetch('http://127.0.0.1:8000/api/analyses/analyze/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ analysis_id: analysisId })
+                });
+
+                const analyzeData = await analyzeRes.json();
+                if (!analyzeRes.ok) throw new Error(analyzeData.message || 'Erreur analyse');
+
+                const result = analyzeData.analysis;
+
+                // --- Affichage résultats ---
+                activateStep(3);
+                document.getElementById('processingStep').classList.add('hidden');
+                document.getElementById('resultsStep').classList.remove('hidden');
+
+                document.getElementById('resultModelName').textContent = result.ai_model || 'AtlasRad AI';
+                document.getElementById('resultText').textContent = result.result || '—';
+                document.getElementById('resultFinding').textContent = result.finding || '—';
+                document.getElementById('confidenceText').textContent = result.confidence_score.toFixed(1) + '%';
+
+                setTimeout(() => {
+                    document.getElementById('confidenceBar').style.width = result.confidence_score + '%';
+                }, 100);
+
+            } catch (err) {
+                document.getElementById('processingStep').classList.add('hidden');
+                document.getElementById('uploadStep').classList.remove('hidden');
+                const errEl = document.getElementById('uploadError');
+                errEl.textContent = '🔌 ' + err.message + ' — Vérifiez que Django (start_server.bat) est allumé.';
+                errEl.classList.remove('hidden');
+                activateStep(0);
+            }
+        }
+    </script>
 
 </body>
 </html>
