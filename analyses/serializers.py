@@ -1,6 +1,7 @@
 """
 AtlasRad - Serializers des Analyses Médicales
 """
+import os
 from rest_framework import serializers
 from .models import Analysis
 
@@ -13,14 +14,21 @@ class AnalysisUploadSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'modality', 'description', 'patient_id']
 
     def validate_image(self, value):
-        """Validation de l'image : taille max 20MB, formats autorisés."""
+        """Validation de l'image : taille max 20MB uniquement.
+        On n'utilise PAS value.content_type car les navigateurs envoient
+        des valeurs très variables (ex: application/octet-stream, image/jpg...).
+        """
         max_size = 20 * 1024 * 1024  # 20 MB
         if value.size > max_size:
             raise serializers.ValidationError("Image trop volumineuse. Limite: 20MB.")
 
-        allowed_types = ['image/jpeg', 'image/png', 'image/dicom', 'application/octet-stream']
-        if value.content_type not in allowed_types:
-            raise serializers.ValidationError("Format non supporté. Accepté: JPEG, PNG, DICOM.")
+        # Vérification de l'extension uniquement (plus fiable que content_type)
+        allowed_ext = ['.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff', '.dcm', '.dicom', '']
+        ext = os.path.splitext(value.name)[1].lower()
+        if ext not in allowed_ext:
+            raise serializers.ValidationError(
+                f"Format non supporté: {ext}. Acceptés : JPG, PNG, BMP, TIFF, DICOM."
+            )
 
         return value
 
