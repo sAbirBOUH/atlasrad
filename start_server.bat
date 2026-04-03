@@ -1,12 +1,19 @@
 @echo off
+title AtlasRad - Serveur Django
 color 0B
 echo.
-echo ==============================================
-echo 🚀 DEMARRAGE DU SERVEUR / MOTEUR ATLASRAD
-echo ==============================================
+echo  ╔══════════════════════════════════════╗
+echo  ║   ATLASRAD - Démarrage Serveur       ║
+echo  ║   Django REST Framework              ║
+echo  ╚══════════════════════════════════════╝
 echo.
-echo Ne fermez pas cette fenetre noire.
-echo C'est le cerveau qui recoit les requetes (Port 8000).
+echo  [►] Lancement du serveur sur http://127.0.0.1:8000
+echo  [►] Admin panel : http://127.0.0.1:8000/admin/
 echo.
-python server.py
+echo  Appuyez sur CTRL+C pour arrêter le serveur.
+echo.
+
+cd /d "%~dp0"
+python manage.py runserver
+
 pause
