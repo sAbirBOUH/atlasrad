@@ -336,42 +336,93 @@
         setTimeout(appendLog, 1500);
 
 
-        // Fetch les vrais examens depuis le Cerveau (server.py)
+        // ─── JWT Token depuis localStorage ───
+        const token = localStorage.getItem('atlasrad_access_token');
+        const user = JSON.parse(localStorage.getItem('atlasrad_user') || '{}');
+        
+        // Redirection si non connecté
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // Affichage du nom de l'utilisateur connecté
+        const userNameEl = document.querySelector('.text-sm.font-bold.text-white');
+        if (userNameEl && user.first_name) {
+            userNameEl.textContent = user.first_name + ' ' + (user.last_name || '');
+        }
+        const userRoleEl = document.querySelector('.text-xs.text-\\[\\#00C8FF\\]');
+        if (userRoleEl && user.role) {
+            userRoleEl.textContent = user.role === 'admin' ? 'Administrateur' : 'Radiologue';
+        }
+
+        // ─── Fetch des examens depuis l'API Django ───
         async function fetchExams() {
             try {
-                const res = await fetch('http://127.0.0.1:8000/api/exams');
+                const res = await fetch('http://127.0.0.1:8000/api/analyses/history/?limit=10', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (res.status === 401) {
+                    // Token expiré -> redirige vers login
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                    return;
+                }
+
                 const data = await res.json();
                 const tbody = document.getElementById('vna-queue');
-                tbody.innerHTML = ''; // On efface pour mettre à jour
-                
-                data.examens.forEach(ex => {
-                    let statusColor = ex.statut.includes("Anonymisé") ? "#00FF9D" : "#E8B856";
-                    let animClass = ex.statut.includes("Anonymisé") ? "" : "animate-pulse";
-                    
+                tbody.innerHTML = '';
+
+                if (!data.analyses || data.analyses.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-[#7A99BB] text-sm">Aucune analyse en base. Uploadez une image via l'API /upload pour commencer.</td></tr>`;
+                    return;
+                }
+
+                data.analyses.forEach(ex => {
+                    const statusMap = {
+                        'completed':  { color: '#00FF9D', label: 'Terminé ✓' },
+                        'pending':    { color: '#E8B856', label: 'En attente' },
+                        'processing': { color: '#00C8FF', label: 'En cours...' },
+                        'error':      { color: '#FF4D6D', label: 'Erreur' },
+                    };
+                    const st = statusMap[ex.statut || ex.status] || statusMap['pending'];
+                    const score = ex.confidence_score ? ex.confidence_score.toFixed(1) + '%' : '—';
+
                     let tr = document.createElement('tr');
-                    tr.classList.add("border-b", "border-[#1A6FA8]/20", "hover:bg-[#1A6FA8]/10", "transition-colors");
+                    tr.classList.add('border-b', 'border-[#1A6FA8]/20', 'hover:bg-[#1A6FA8]/10', 'transition-colors');
                     tr.innerHTML = `
-                        <td class="font-mono text-[#00C8FF] font-bold p-4 py-3">${ex.id}</td>
-                        <td class="p-4 py-3"><span class="bg-gray-800 text-xs px-2 py-1 rounded font-bold border border-gray-600">${ex.modalite}</span></td>
-                        <td class="text-sm p-4 py-3">${ex.description}</td>
-                        <td class="text-sm font-semibold text-[#1A6FA8] p-4 py-3">${ex.ia}</td>
+                        <td class="font-mono text-[#00C8FF] font-bold p-4 py-3">${ex.patient_id || ex.id}</td>
+                        <td class="p-4 py-3"><span class="bg-gray-800 text-xs px-2 py-1 rounded font-bold border border-gray-600">${ex.modality}</span></td>
+                        <td class="text-sm p-4 py-3">${ex.description || '—'}</td>
+                        <td class="text-sm font-semibold text-[#1A6FA8] p-4 py-3 max-w-[160px] truncate" title="${ex.ai_model || ex.ia || ''}">${ex.ai_model || ex.ia || 'AtlasRad AI'}</td>
                         <td class="p-4 py-3">
                             <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full ${animClass}" style="background:${statusColor}; box-shadow: 0 0 10px ${statusColor}"></span> 
-                                <span class="text-xs font-bold" style="color:${statusColor}">${ex.statut}</span>
+                                <span class="w-2 h-2 rounded-full" style="background:${st.color}; box-shadow:0 0 8px ${st.color}"></span>
+                                <span class="text-xs font-bold" style="color:${st.color}">${st.label}</span>
                             </div>
                         </td>
-                        <td class="p-4 py-3"><button class="text-xs font-bold bg-[#1A6FA8]/20 px-3 py-1 rounded border border-[#1A6FA8] text-[#00C8FF] hover:bg-[#1A6FA8] hover:text-white uppercase transition-all">Ouvrir</button></td>
+                        <td class="p-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-[#7A99BB] font-mono">${score}</span>
+                                <button onclick="openReportModal('${ex.patient_id || ex.id}', '${ex.description || ''}', '${ex.ai_model || ''}')" 
+                                    class="text-xs font-bold bg-[#1A6FA8]/20 px-3 py-1 rounded border border-[#1A6FA8] text-[#00C8FF] hover:bg-[#1A6FA8] hover:text-white uppercase transition-all">
+                                    Ouvrir
+                                </button>
+                            </div>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch(e) {
-                console.error("API non détectée : Le serveur Python est-il allumé sur le port 8000 ?", e);
+                console.error('API Django non joignable. Port 8000 allumé ?', e);
             }
         }
         
-        // Rafraîchissement automatique de la liste toutes les 2 secondes (Live Feed)
-        setInterval(fetchExams, 2000);
+        // Rafraîchissement toutes les 5 secondes
+        setInterval(fetchExams, 5000);
         fetchExams();
 
     
