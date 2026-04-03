@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>AtlasRad | Performance Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@200;300;400;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --navy: #040D1A;
+            --blue: #1A6FA8;
+            --gold: #C5922A;
+            --gold2: #E8B856;
+            --cyan: #00C8FF;
+            --green: #00FF9D;
+            --red: #FF4D6D;
+            --text: #E8EDF5;
+            --muted: #7A99BB;
+        }
+        body {
+            background: var(--navy);
+            color: var(--text);
+            font-family: 'Exo 2', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image: linear-gradient(rgba(26,111,168,0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(26,111,168,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .glass { background: rgba(11,30,61,0.45); backdrop-filter: blur(14px); border: 1px solid rgba(197,146,42,0.25); }
+        .glass-blue { background: rgba(26,111,168,0.1); border: 1px solid rgba(26,111,168,0.3); }
+        .glow-gold { box-shadow: 0 0 25px rgba(197,146,42,0.2); }
+        .glow-cyan { box-shadow: 0 0 25px rgba(0,200,255,0.15); }
+        .glow-green { box-shadow: 0 0 25px rgba(0,255,157,0.15); }
+
+        /* Animated counter */
+        .counter { transition: all 0.3s; }
+
+        /* Progress bars */
+        .bar-fill { height: 100%; border-radius: 4px; transition: width 1.5s cubic-bezier(0.16,1,0.3,1); }
+
+        /* Pulse dot */
+        .live { animation: pulse-live 1.5s infinite; }
+        @keyframes pulse-live {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        /* Scroll fade-in */
+        .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .fade-up.visible { opacity: 1; transform: none; }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between px-8 border-b border-[#1A6FA8]/30 bg-[#040D1A]/80 backdrop-blur-md">
+    <a href="dashboard.html" class="flex items-center gap-3">
+        <svg class="w-8 h-8" viewBox="0 0 100 100">
+            <polygon points="50,7 53,19 62,11 59,23 70,18 65,29 77,27 70,36 82,38 73,44 84,50 73,56 82,62 70,64 77,73 65,71 70,82 59,77 62,89 53,81 50,93 47,81 38,89 41,77 30,82 35,71 23,73 30,64 18,62 27,56 16,50 27,44 18,38 30,36 23,27 35,29 30,18 41,23 38,11 47,19" fill="none" stroke="#C5922A" stroke-width="2"/>
+            <circle cx="50" cy="50" r="20" fill="none" stroke="#1A6FA8" stroke-width="2"/>
+            <circle cx="50" cy="50" r="4" fill="#00C8FF"/>
+        </svg>
+        <span class="font-['Rajdhani'] text-xl font-bold tracking-widest">ATLAS<span class="text-[#C5922A]">RAD</span></span>
+    </a>
+    <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 text-xs font-['Rajdhani'] uppercase tracking-widest text-[#00FF9D]">
+            <span class="w-2 h-2 rounded-full bg-[#00FF9D] live"></span>
+            Live Data Feed
+        </div>
+        <a href="index.html" class="text-xs text-[#7A99BB] hover:text-white transition-colors uppercase tracking-widest font-['Rajdhani']">← Site Public</a>
+    </div>
+</nav>
+
+<main class="relative z-10 pt-24 pb-16 px-4 sm:px-8 max-w-7xl mx-auto">
+
+    <!-- Page Header -->
+    <div class="mb-12 fade-up">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#1A6FA8] bg-[#1A6FA8]/10 text-[#00C8FF] text-xs font-bold mb-4 font-['Rajdhani'] tracking-widest uppercase">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#00C8FF] live"></span>
+            Board Report – Performance Insights
+        </div>
+        <h1 class="text-5xl font-bold font-['Exo_2'] mb-3">Métriques en Temps Réel</h1>
+        <p class="text-[#7A99BB] text-lg">Vue analytique globale de la plateforme AtlasRad — données cumulées sur tous les nœuds VNA actifs.</p>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
+        <!-- KPI 1 -->
+        <div class="glass rounded-2xl p-6 glow-gold fade-up">
+            <div class="text-xs font-bold text-[#7A99BB] uppercase tracking-widest mb-2">Études Routées (Total)</div>
+            <div id="kpi1" class="text-4xl font-bold text-white font-['Rajdhani']">0</div>
+            <div class="text-xs text-[#00FF9D] mt-2 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                +18% ce mois
+            </div>
+        </div>
+        <!-- KPI 2 -->
+        <div class="glass rounded-2xl p-6 fade-up">
+            <div class="text-xs font-bold text-[#7A99BB] uppercase tracking-widest mb-2">Taux de Détection IA</div>
+            <div id="kpi2" class="text-4xl font-bold text-[#00C8FF] font-['Rajdhani']">0%</div>
+            <div class="text-xs text-[#7A99BB] mt-2">Sensibilité moyenne des modèles</div>
+        </div>
+        <!-- KPI 3 -->
+        <div class="glass rounded-2xl p-6 fade-up">
+            <div class="text-xs font-bold text-[#7A99BB] uppercase tracking-widest mb-2">Temps d'Analyse Moyen</div>
+            <div id="kpi3" class="text-4xl font-bold text-[#E8B856] font-['Rajdhani']">0s</div>
+            <div class="text-xs text-[#00FF9D] mt-2">vs 45 min manuellement</div>
+        </div>
+        <!-- KPI 4 -->
+        <div class="glass rounded-2xl p-6 fade-up">
+            <div class="text-xs font-bold text-[#7A99BB] uppercase tracking-widest mb-2">Cliniques Connectées</div>
+            <div id="kpi4" class="text-4xl font-bold text-[#00FF9D] font-['Rajdhani']">0</div>
+            <div class="text-xs text-[#7A99BB] mt-2">Nœuds VNA actifs</div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Volume Chart -->
+        <div class="lg:col-span-2 glass rounded-2xl p-6 glow-cyan fade-up">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold font-['Rajdhani'] uppercase tracking-widest text-white">Volume DICOM Quotidien (30 jours)</h3>
+                <div class="flex gap-2">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#1A6FA8]/30 text-[#00C8FF] border border-[#1A6FA8]/50">CT</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#C5922A]/20 text-[#E8B856] border border-[#C5922A]/30">MR</span>
+                </div>
+            </div>
+            <canvas id="volumeChart" height="160"></canvas>
+        </div>
+        <!-- Modality Pie -->
+        <div class="glass rounded-2xl p-6 fade-up">
+            <h3 class="font-bold font-['Rajdhani'] uppercase tracking-widest text-white mb-4">Répartition Modalités</h3>
+            <canvas id="modalityChart" height="200"></canvas>
+            <div class="mt-4 space-y-2">
+                <div class="flex justify-between text-xs"><span class="text-[#00C8FF]">● CT Scan</span><span class="font-bold">48%</span></div>
+                <div class="flex justify-between text-xs"><span class="text-[#C5922A]">● IRM</span><span class="font-bold">32%</span></div>
+                <div class="flex justify-between text-xs"><span class="text-[#00FF9D]">● Radio</span><span class="font-bold">14%</span></div>
+                <div class="flex justify-between text-xs"><span class="text-[#7A99BB]">● Echo</span><span class="font-bold">6%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Models & Urgency -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- AI Models Performance -->
+        <div class="glass rounded-2xl p-6 fade-up">
+            <h3 class="font-bold font-['Rajdhani'] uppercase tracking-widest text-white mb-6">Performance des Agents IA</h3>
+            <div class="space-y-5">
+                <div>
+                    <div class="flex justify-between text-sm mb-2"><span>MONAI Brain Tumor</span><span class="text-[#00C8FF] font-bold">97.8%</span></div>
+                    <div class="h-2 bg-gray-800 rounded-full"><div class="bar-fill bg-gradient-to-r from-[#1A6FA8] to-[#00C8FF] w-0" data-width="97.8"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-2"><span>LUNA16 Nodule Pulmonaire</span><span class="text-[#E8B856] font-bold">94.2%</span></div>
+                    <div class="h-2 bg-gray-800 rounded-full"><div class="bar-fill bg-gradient-to-r from-[#C5922A] to-[#E8B856] w-0" data-width="94.2"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-2"><span>AortaSeg (Aorte)</span><span class="text-[#00FF9D] font-bold">96.1%</span></div>
+                    <div class="h-2 bg-gray-800 rounded-full"><div class="bar-fill bg-gradient-to-r from-[#00FF9D] to-[#1A6FA8] w-0" data-width="96.1"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-2"><span>Stroke Net (AVC)</span><span class="text-red-400 font-bold">99.1%</span></div>
+                    <div class="h-2 bg-gray-800 rounded-full"><div class="bar-fill bg-gradient-to-r from-red-600 to-red-400 w-0" data-width="99.1"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-2"><span>PelvicBone Lesions</span><span class="text-[#7A99BB] font-bold">91.5%</span></div>
+                    <div class="h-2 bg-gray-800 rounded-full"><div class="bar-fill bg-gradient-to-r from-[#7A99BB] to-gray-400 w-0" data-width="91.5"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Urgency Funnel -->
+        <div class="glass rounded-2xl p-6 fade-up">
+            <h3 class="font-bold font-['Rajdhani'] uppercase tracking-widest text-white mb-6">Triage automatique d'Urgence</h3>
+            <div class="space-y-4">
+                <div class="glass-blue rounded-xl p-4 flex items-center gap-4 border-l-4 border-red-500">
+                    <svg class="w-10 h-10 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><span class="font-bold text-red-400 uppercase text-sm">Critique (STAT)</span><span class="font-['Rajdhani'] text-2xl text-red-400 font-bold">4.2%</span></div>
+                        <div class="text-xs text-gray-400 mt-1">Dirigé vers Radiologue de garde en &lt;30s</div>
+                    </div>
+                </div>
+                <div class="glass-blue rounded-xl p-4 flex items-center gap-4 border-l-4 border-[#E8B856]">
+                    <svg class="w-10 h-10 text-[#E8B856] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><span class="font-bold text-[#E8B856] uppercase text-sm">Semi-Urgent</span><span class="font-['Rajdhani'] text-2xl text-[#E8B856] font-bold">21.7%</span></div>
+                        <div class="text-xs text-gray-400 mt-1">Analyse prioritaire en &lt;4h</div>
+                    </div>
+                </div>
+                <div class="glass-blue rounded-xl p-4 flex items-center gap-4 border-l-4 border-[#00FF9D]">
+                    <svg class="w-10 h-10 text-[#00FF9D] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div class="flex-1">
+                        <div class="flex justify-between"><span class="font-bold text-[#00FF9D] uppercase text-sm">Routinier</span><span class="font-['Rajdhani'] text-2xl text-[#00FF9D] font-bold">74.1%</span></div>
+                        <div class="text-xs text-gray-400 mt-1">Traité dans la file standard 24h</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Projection -->
+    <div class="glass rounded-2xl p-8 glow-gold fade-up mb-8">
+        <div class="flex flex-col lg:flex-row gap-8 items-center">
+            <div class="flex-1">
+                <div class="text-xs text-[#C5922A] font-bold uppercase tracking-widest mb-2">Projection de Revenus (Modèle SaaS)</div>
+                <h3 class="text-4xl font-bold text-white font-['Exo_2'] mb-4">€1.2M ARR à 12 mois</h3>
+                <p class="text-[#7A99BB] text-sm leading-relaxed mb-6">Projection basée sur un scénario conservateur avec <strong class="text-white">30 cliniques</strong> abonnées à un plan Enterprise moyen de <strong class="text-white">€3,400/mois</strong>.</p>
+                <div class="flex gap-8">
+                    <div><div class="text-xs text-[#7A99BB]">CAC moyen</div><div class="text-xl font-bold text-white font-['Rajdhani']">€480</div></div>
+                    <div><div class="text-xs text-[#7A99BB]">LTV moyen</div><div class="text-xl font-bold text-[#00FF9D] font-['Rajdhani']">€38,000</div></div>
+                    <div><div class="text-xs text-[#7A99BB]">Ratio LTV/CAC</div><div class="text-xl font-bold text-[#C5922A] font-['Rajdhani']">79x</div></div>
+                </div>
+            </div>
+            <div class="w-full max-w-md"><canvas id="revenueChart" height="140"></canvas></div>
+        </div>
+    </div>
+
+    <!-- Footer badge -->
+    <div class="text-center text-xs text-gray-600 font-mono">
+        AtlasRad Analytics Engine v1.0 — Données simulées à des fins de présentation
+    </div>
+</main>
+
+<script>
+    // ── Intersection Observer for fade-up animations ──
+    const fadels = document.querySelectorAll('.fade-up');
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.05 });
+    fadels.forEach(el => obs.observe(el));
+
+    // ── Animated Counters ──
+    function animateCounter(id, target, suffix='', decimals=0) {
+        let el = document.getElementById(id), start = 0, dur = 1800;
+        let startTime = null;
+        function step(ts) {
+            if(!startTime) startTime = ts;
+            let prog = Math.min((ts - startTime) / dur, 1);
+            let ease = 1 - Math.pow(1 - prog, 4);
+            let val = start + (target - start) * ease;
+            el.textContent = decimals ? val.toFixed(decimals) + suffix : Math.round(val).toLocaleString() + suffix;
+            if(prog < 1) requestAnimationFrame(step);
+        }
+        setTimeout(() => requestAnimationFrame(step), 400);
+    }
+    animateCounter('kpi1', 487234);
+    animateCounter('kpi2', 97.4, '%', 1);
+    animateCounter('kpi3', 2.4, 's', 1);
+    animateCounter('kpi4', 12);
+
+    // ── Animate Progress Bars ──
+    setTimeout(() => {
+        document.querySelectorAll('.bar-fill').forEach(bar => {
+            bar.style.width = bar.dataset.width + '%';
+        });
+    }, 600);
+
+    // ── Daily Volume Chart ──
+    const days = Array.from({length: 30}, (_,i) => `J${i+1}`);
+    const ctData = days.map(() => Math.floor(Math.random() * 300 + 600));
+    const mrData = days.map(() => Math.floor(Math.random() * 200 + 300));
+    new Chart(document.getElementById('volumeChart'), {
+        type: 'line',
+        data: {
+            labels: days,
+            datasets: [
+                { label: 'CT', data: ctData, borderColor: '#00C8FF', backgroundColor: 'rgba(0,200,255,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4 },
+                { label: 'MR', data: mrData, borderColor: '#C5922A', backgroundColor: 'rgba(197,146,42,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4 }
+            ]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7A99BB', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7A99BB', font: { size: 10 } } } } }
+    });
+
+    // ── Modality Doughnut ──
+    new Chart(document.getElementById('modalityChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['CT', 'MR', 'CR', 'US'],
+            datasets: [{ data: [48,32,14,6], backgroundColor: ['#00C8FF','#C5922A','#00FF9D','#7A99BB'], borderColor: '#040D1A', borderWidth: 3 }]
+        },
+        options: { plugins: { legend: { display: false } }, cutout: '72%' }
+    });
+
+    // ── Revenue Projection Chart ──
+    const months = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+    const revenue = [0, 12, 25, 48, 82, 130, 195, 280, 390, 520, 680, 820];
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'ARR (k€)',
+                data: revenue,
+                backgroundColor: revenue.map((v,i) => i < 11 ? 'rgba(197,146,42,0.4)' : 'rgba(0,255,157,0.5)'),
+                borderColor: revenue.map((v,i) => i < 11 ? '#C5922A' : '#00FF9D'),
+                borderWidth: 1, borderRadius: 4
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#7A99BB', font: { size: 10 } } },
+                y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7A99BB', font: { size: 10 }, callback: v => '€'+v+'k' } }
+            }
+        }
+    });
+</script>
+</body>
+</html>
