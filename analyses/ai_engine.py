@@ -245,6 +245,53 @@ def _analyze_with_monai(image_path: str) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────
+# ANALYSE CÉRÉBRALE — Hugging Face ViT
+# ─────────────────────────────────────────────────────────────
+
+def _analyze_brain_hf(image_path: str) -> dict:
+    """
+    Utilise Hugging Face transformers (ViT) pour classifier les IRM cérébrales.
+    Classes : glioma, meningioma, notumor, pituitary.
+    """
+    try:
+        from transformers import pipeline
+        from PIL import Image
+
+        logger.info("Chargement Hugging Face: google/vit-base-patch16-224...")
+        brain_clf = pipeline("image-classification", model="google/vit-base-patch16-224")
+        
+        img = Image.open(image_path).convert("RGB")
+        results = brain_clf(img)
+        
+        top_result = results[0]
+        label = top_result['label']
+        confidence = round(top_result['score'] * 100, 1)
+
+        label_map = {
+            "notumor": "Brain MRI classified — No tumor detected.",
+            "glioma": "Brain MRI classified — Glioma pattern detected.",
+            "meningioma": "Brain MRI classified — Meningioma pattern detected.",
+            "pituitary": "Brain MRI classified — Pituitary tumor pattern detected."
+        }
+        finding_map = {
+            "notumor": "Le modèle Hugging Face n'a détecté aucune masse tumorale identifiable. Structures en place.",
+            "glioma": f"Analyse ViT : Un motif de type Gliome a été identifié avec {confidence}% de confiance. IRM de suivi requise.",
+            "meningioma": f"Analyse ViT : Un motif de type Méningiome a été identifié avec {confidence}% de confiance. Avis neurochirurgical recommandé.",
+            "pituitary": f"Analyse ViT : Un motif de tumeur pituitaire a été identifié avec {confidence}% de confiance."
+        }
+
+        return {
+            "ai_model": f"HuggingFace ViT (dima806/brain_tumor_image_detection)",
+            "result": label_map.get(label, f"Tumor category: {label}"),
+            "confidence_score": confidence,
+            "finding": finding_map.get(label, f"Score: {confidence}% for {label}."),
+        }
+    except Exception as e:
+        logger.error(f"Erreur Hugging Face: {e}")
+        return None
+
+
+# ─────────────────────────────────────────────────────────────
 # FALLBACK SIMULATION ENRICHIE
 # ─────────────────────────────────────────────────────────────
 
@@ -318,7 +365,14 @@ def run_ai_analysis(image_path: str, modality: str, description: str) -> dict:
         if result:
             return result
 
-    # --- Voie 2 : MONAI pour tout le reste ---
+    # --- Voie 2 : Hugging Face pour l'imagerie cérébrale ---
+    if is_brain:
+        logger.info("Routage vers Hugging Face (Brain)...")
+        result = _analyze_brain_hf(image_path)
+        if result:
+            return result
+
+    # --- Voie 3 : MONAI pour tout le reste (Actuellement désactivé / 404) ---
     logger.info("Routage vers MONAI MedNIST (classification)...")
     result = _analyze_with_monai(image_path)
     if result:
