@@ -1,0 +1,10 @@
+# PyTorch (CPU version recommended for inference/testing)
+--index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+torchaudio
+
+# Medical AI Libraries
+torchxrayvision
+monai
+scikit-image

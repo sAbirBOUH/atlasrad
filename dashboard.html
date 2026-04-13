@@ -360,7 +360,7 @@
         // ─── Fetch des examens depuis l'API Django ───
         async function fetchExams() {
             try {
-                const res = await fetch('http://127.0.0.1:8000/api/analyses/history/?limit=10', {
+                const res = await fetch('http://127.0.0.1:8001/api/analyses/history/?limit=10', {
                     headers: {
                         'Authorization': 'Bearer ' + token,
                         'Content-Type': 'application/json'
@@ -794,7 +794,7 @@
             formData.append('patient_id', patientId);
 
             try {
-                const uploadRes = await fetch('http://127.0.0.1:8000/api/analyses/upload/', {
+                const uploadRes = await fetch('http://127.0.0.1:8001/api/analyses/upload/', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token },
                     body: formData
@@ -809,7 +809,7 @@
                 document.getElementById('processingText').textContent = 'Moteur IA en cours d\'analyse...';
                 activateStep(2);
 
-                const analyzeRes = await fetch('http://127.0.0.1:8000/api/analyses/analyze/', {
+                const analyzeRes = await fetch('http://127.0.0.1:8001/api/analyses/analyze/', {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + token,

@@ -59,19 +59,16 @@ def _load_monai():
             logger.info("Chargement MONAI DenseNet (MedNIST)...")
             model = DenseNet121(spatial_dims=2, in_channels=1, out_channels=len(MONAI_CLASSES))
 
-            # Téléchargement du checkpoint officiel MedNIST
-            weights_url = (
-                "https://github.com/Project-MONAI/MONAI-extra-test-data/"
-                "releases/download/0.8.1/mednist_DenseNet_v2.pt"
-            )
+            # Validation de l'existence du checkpoint officiel MedNIST
             cache_dir = Path.home() / ".monai_cache"
-            cache_dir.mkdir(exist_ok=True)
             weights_path = cache_dir / "mednist_DenseNet_v2.pt"
 
             if not weights_path.exists():
-                import urllib.request
-                logger.info(f"Téléchargement des poids MONAI depuis {weights_url}...")
-                urllib.request.urlretrieve(weights_url, weights_path)
+                raise RuntimeError(
+                    "Les poids pre-entrainés MONAI (mednist_DenseNet_v2.pt) "
+                    "n'existent plus sur le lien officiel GitHub (404). "
+                    "Fallback sur la simulation."
+                )
 
             checkpoint = torch.load(weights_path, map_location="cpu", weights_only=False)
             model.load_state_dict(checkpoint)
